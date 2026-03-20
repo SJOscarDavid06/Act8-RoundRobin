@@ -17,6 +17,8 @@ public class Actividad8 {
     private DefaultListModel<String> listModel;
     private DefaultListModel<String> listModel2;
     private java.util.ArrayList<Integer> procesos = new java.util.ArrayList<>();
+    private Timer guiTimer; // Atributo para el Timer (Punto 4)
+    private java.util.List<Proceso> listaProcesosObj = new java.util.ArrayList<>();
     public Actividad8() {
         //Modelos
         listModel = new DefaultListModel();
@@ -74,6 +76,25 @@ public class Actividad8 {
 
         agregarProcesoButton.setFocusPainted(false);
         iniciarSimulacionButton.setFocusPainted(false);
+
+        configurarTimerRefresco();
+    }
+    private void configurarTimerRefresco() {
+        // Creamos el Timer de Swing (ejecuta cada 200ms)
+        guiTimer = new Timer(200, e -> {
+            actualizarInterfaz();
+        });
+        guiTimer.start();
+    }
+
+    private void actualizarInterfaz() {
+        // Esta es la "Sincronización GUI-Modelo"
+        // Limpiamos el modelo visual y lo repoblamos con los datos reales del objeto Proceso
+        listModel.clear();
+        for (Proceso p : listaProcesosObj) {
+            String info = "Proceso " + p.getId() + " - " + p.getEstado() + " (" + p.getTiempoRestante() + "s)";
+            listModel.addElement(info);
+        }
     }
     private void simular() {
         new Thread(() -> {
