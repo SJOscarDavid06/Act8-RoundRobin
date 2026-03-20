@@ -2,6 +2,12 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
 
+/**
+ * Clase principal que controla la venta y la simulación.
+ * Esta clase se encarga de recibir los datos del usuario,
+ * los guarda en una lista y ejecuta un hilo que muestra el conteo del tiempo en pantalla
+ *
+ */
 public class Actividad8 {
 
     private JPanel panel;
@@ -17,6 +23,11 @@ public class Actividad8 {
     private DefaultListModel<String> listModel;
     private DefaultListModel<String> listModel2;
     private java.util.ArrayList<Integer> procesos = new java.util.ArrayList<>();
+
+    /**
+     * Constructor de la clase
+     * Se limpia la interfaz, se aplican los colores ya definidos y se preparan los botones
+     */
     public Actividad8() {
         //Modelos
         listModel = new DefaultListModel();
@@ -28,7 +39,7 @@ public class Actividad8 {
         slider1.setMaximum(10);
         slider1.setMinimum(1);
         slider1.setValue(1);
-        slider1.addChangeListener(e -> label2.setText("Valor: "+slider1.getValue()));
+        slider1.addChangeListener(e -> label2.setText("Valor: " + slider1.getValue()));
         //Acciones de botones
         agregarProcesoButton.addActionListener(e -> agregarProceso());
         iniciarSimulacionButton.addActionListener(e -> simular());
@@ -75,6 +86,11 @@ public class Actividad8 {
         agregarProcesoButton.setFocusPainted(false);
         iniciarSimulacionButton.setFocusPainted(false);
     }
+
+    /**
+     * Este metodo es el motor que corre un hilo por separado
+     * Va tomando cada tiempo de lista y lo muestra
+     */
     private void simular() {
         new Thread(() -> {
 
@@ -124,13 +140,23 @@ public class Actividad8 {
 
         }).start();
     }
+
+    /**
+     * Toma el valor que el usuario eligió del slider y lo guarda
+     * en la lista de procesos para que después pueda ser simulado
+     *
+     */
     private void agregarProceso() {
         int valor = slider1.getValue(); //obtiene el valor del slider
         procesos.add(valor);//guarda valor
-        listModel.addElement("Proceso"+(listModel.getSize()+1)+"( "+valor+")");
+        listModel.addElement("Proceso" + (listModel.getSize() + 1) + "( " + valor + ")");
     }
 
-
+    /**
+     * Clase principal
+     * Es el punto de entrada del programa. Crea la ventana, le pone título y tamaño
+     *
+     */
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             JFrame frame = new JFrame("Actividad 7");
