@@ -25,7 +25,7 @@ public class Actividad8 {
     private java.util.ArrayList<Integer> procesos = new java.util.ArrayList<>();
     private Timer guiTimer; // Atributo para el Timer (Punto 4)
     private java.util.List<Proceso> listaProcesosObj = new java.util.ArrayList<>();
-
+    private int contadorIds = 1;
     /**
      * Constructor de la clase
      * Se limpia la interfaz, se aplican los colores ya definidos y se preparan los botones
@@ -114,51 +114,49 @@ public class Actividad8 {
      */
     private void simular() {
         new Thread(() -> {
+            while (!listaProcesosObj.isEmpty()) {
+                // Tomamos el proceso en turno
+                Proceso pActual = listaProcesosObj.get(0);
+                pActual.setEstado("Procesando");
 
-            while (!procesos.isEmpty()) {
-
-                int tiempo = procesos.get(0);
-
-                // quitar de list1 (pero NO tocar list2)
+                // Encabezado visual en la lista 2
                 SwingUtilities.invokeLater(() -> {
-                    listModel.remove(0);
-                    listModel2.addElement("Proceso (" + tiempo + ")"); // encabezado
+                    listModel2.addElement("Proceso " + pActual.getId() + " (" + pActual.getTiempoTotal() + "s)");
                 });
 
-                // mostrar conteo
-                for (int i = 1; i <= tiempo; i++) {
-                    int valor = i;
-
-                    SwingUtilities.invokeLater(() -> {
-                        listModel2.addElement("  " + valor); // se va acumulando
-                        slider1.setValue(valor);
-                    });
-
+                // Ciclo de vida del proceso
+                while (pActual.getTiempoRestante() > 0) {
                     try {
-                        Thread.sleep(500);
+                        Thread.sleep(500); // Simulamos el paso del tiempo
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
+
+                    pActual.decrementarTiempo(); // El Timer reflejará esto en list1 automáticamente
+
+                    // Actualizar slider y conteo en list2
+                    int progreso = pActual.getTiempoTotal() - pActual.getTiempoRestante();
+                    SwingUtilities.invokeLater(() -> {
+                        listModel2.addElement("  " + progreso);
+                        slider1.setValue(progreso);
+                    });
                 }
 
-                // marcar final
-                SwingUtilities.invokeLater(() -> {
-                    listModel2.addElement("✔ Terminado\n");
-                });
+                pActual.setEstado("Terminado");
+                SwingUtilities.invokeLater(() -> listModel2.addElement("✔ Terminado\n"));
 
-                procesos.remove(0);
+                // Lo sacamos de la lista, el Timer lo borrará de la pantalla
+                listaProcesosObj.remove(0);
 
                 try {
-                    Thread.sleep(500);
+                    Thread.sleep(500); // Breve pausa antes del siguiente proceso
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
 
-            SwingUtilities.invokeLater(() -> {
-                slider1.setValue(0);
-            });
-
+            // Resetear slider al terminar todos los procesos
+            SwingUtilities.invokeLater(() -> slider1.setValue(0));
         }).start();
     }
 
@@ -168,9 +166,9 @@ public class Actividad8 {
      *
      */
     private void agregarProceso() {
-        int valor = slider1.getValue(); //obtiene el valor del slider
-        procesos.add(valor);//guarda valor
-        listModel.addElement("Proceso" + (listModel.getSize() + 1) + "( " + valor + ")");
+        int valor = slider1.getValue();
+        Proceso nuevoProceso = new Proceso(contadorIds++, valor);
+        listaProcesosObj.add(nuevoProceso);
     }
 
     /**
